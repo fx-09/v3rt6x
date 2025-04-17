@@ -1,0 +1,138 @@
+#!/usr/bin/env ruby
+# encoding: ASCII-8Bit
+# ruby 2.0.0
+require 'io/console'
+print "\033]0;ChemDraw 17~23 (macOS) Universal Patcher (v0rt3x) by Đức Lê.4\007"
+
+def removeSig(filename)
+    puts "\e[1;33mĐang làm việc với đường dẫn:\e[0m #{filename}..."
+    f = open(filename, "r+b") # read and write, binary type.
+
+    f.seek(16)
+    tmp = f.read(16)
+    ncmd = tmp[0, 4].unpack('l')[0]
+    cmdSize = tmp[4, 4].unpack('l')[0]
+    f.seek(32) # end of mach head.
+
+    f.seek(cmdSize-16, 1)
+    tmp = f.read(16) # end of load cmd.
+    if tmp[0, 4] != "\x1d\0\0\0" # LC_CODE_SIGNATURE
+        puts "\e[1;33mCảnh báo: Không phát hiện ra chữ ký. Bạn có tải ChemDraw từ đúng nguồn không đấy?\e[0m"
+        f.close; return false
+    end
+    sigOffset = tmp[8, 4].unpack('l')[0]
+    sigSize = tmp[12, 4].unpack('l')[0]
+    puts "\e[1;32mPhát hiện DRM.\e[0m @ 0x#{sigOffset.to_s(16)} (+ 0x#{sigSize.to_s(16)})"
+    print "\e[1;32mBạn có muốn \e[7mTHUỐC\e[0m chứ[y/N]? (Không thể hoàn tác được đâu nhé :v) "
+    if STDIN.getch.downcase == 'y'
+        f.seek(-16, 1)
+        f.write("\0"*16) # end of load cmd.
+        f.seek(16)
+        f.write([ncmd-1].pack('l'))
+        f.write([cmdSize-16].pack('l'))
+        f.seek(sigOffset)
+        f.write("\0"*sigSize)
+        f.close
+
+        puts "\e[1;32mLoại bỏ DRM thành công.\e[0m"
+        return true
+    end
+    puts("\e[1;33mKhông có bất kỳ thao tác nào đã được thực hiện.\e[0m")
+    f.close; return false
+rescue # error
+    puts "\e[1;31mĐã phát sinh lỗi:\e[0m"
+    puts $!.inspect
+    puts $@.inspect
+    return false
+end
+
+def patch(filename)
+    puts "\e[1;33mTiến hành vá\e[0m #{filename}..."
+    f = open(filename, "r+b") # read and write, binary.
+    @times = @byte = 0 # number of to-be-patched patterns, processed length.
+    loop do
+        b = f.gets(sep="\xC3") # read until met with 0xC3 (RET).
+        if b.nil? then f.close; break end # EOF
+        len = b.size # read length
+        byte = (f.pos / 104857.6).to_i
+        print "\r\e[1;33mĐã thực hiện được %.1f MB.\e[0m " % (byte/10.0) if byte != @byte
+        @byte = byte
+        
+        next if len < 30
+        if b[-30, 3] == "\x41\x89\xc6"
+        # Ver 18/19: 41 89 C6 48 8D 7D B8 ..{5} 44 89 F0 48 83 C4 28 5B 41 5C 41 5D 41 5E 41 5F 5D C3
+            case b[-18, 3]
+            when "\x44\x89\xf0" # to-patch
+                puts "\e[1;32m\rĐã tìm ra mẫu:\e[0m @ 0x#{f.pos.to_s(16)}, MOV EAX, R14D -> XOR EAX, EAX: 41 89 C6 ..{9} \e[7m44 89 F0\e[0m ..{14} C3 => \e[7m31 C0 90\e[0m"
+                print "\e[1;32mBạn có muốn \e[7mTHUỐC\e[0m chứ [y/N]? "
+                break if STDIN.getch.downcase == 'n' # canceled by user.
+                f.seek(-18, 1); f.write("\x31\xc0\x90"); f.seek(15, 1)
+            when "\x31\xc0\x90" # patched
+                puts "\e[1;34m\rĐã tìm ra mẫu:\e[0m @ 0x#{f.pos.to_s(16)}, XOR EAX, EAX -> MOV EAX, R14D: 41 89 C6 ..{9} \e[7m31 C0 90\e[0m ..{14} C3 => \e[7m44 89 F0\e[0m"
+                print "\e[1;34mBạn có muốn \e[7mHOÀN TÁC\e[0m không [y/N]? "
+                break if STDIN.getch.downcase == 'n' # canceled by user.
+                f.seek(-18, 1); f.write("\x44\x89\xf0"); f.seek(15, 1)
+            else next
+            end
+        elsif b[-28, 3] == "\x45\x31\xe4"
+        # Ver 17: 45 31 E4 48 8D 7D B0 ..{5} 44 88 E0 48 83 C4 40 5B 41 5C 41 5E 41 5F 5D C3
+            case b[-16, 3]
+            when "\x44\x88\xe0" # to-patch
+                puts "\e[1;32m\rĐã tìm ra mẫu:\e[0m @ 0x#{f.pos.to_s(16)}, MOV AL, R12B -> MOV AL, 0x01: 45 31 E4 ..{9} \e[7m44 88 E0\e[0m ..{12} C3 => \e[7mB0 01 90\e[0m"
+                print "\e[1;32mBạn có muốn \e[7mTHUỐC\e[0m không [y/N]? "
+                break if STDIN.getch.downcase == 'n' # canceled by user.
+                f.seek(-16, 1); f.write("\xb0\x01\x90"); f.seek(13, 1)
+            when "\xb0\x01\x90" # patched
+                puts "\e[1;34m\rĐã tìm ra mẫu\e[0m @ 0x#{f.pos.to_s(16)}, MOV AL, 0x01 -> MOV AL, R12B: 45 31 E4 ..{9} \e[7mB0 01 90\e[0m ..{12} C3 => \e[7m44 88 E0\e[0m"
+                print "\e[1;34mBạn có muốn \e[7mHOÀN TÁC\e[0m không [y/N]? "
+                break if STDIN.getch.downcase == 'n' # canceled by user.
+                f.seek(-16, 1); f.write("\x44\x88\xe0"); f.seek(13, 1)
+            else next
+            end
+        else next # not a to-be-patched pattern; roll back.
+        end
+        @times += 1
+        ###
+        break # there are multiple patterns; however, only the first one is what we desire.
+    end
+    if @times.zero?
+        # not applicable
+        puts "\e[1;33mKhông tìm được mẫu hoặc người dùng đã huỷ tiến trình.\e[0m"
+        return false
+    else
+        puts "\e[1;33mĐã vá/hoàn tác #{@times} lần trong file này.\e[0m"
+        return true
+    end
+rescue # error
+    puts "\e[1;31mĐã phát sinh lỗi:\e[0m"
+    puts $!.inspect
+    puts $@.inspect
+    return false
+end
+
+# Main
+@vers = 0 # total number of versions of ChemDraw
+Dir.entries('/Applications').each do |i|
+    next unless i.include?('ChemDraw')
+    puts; print "\e[7m"; puts '-'*50; puts i.sub('.app', '').ljust(50); puts '-'*50; print "\e[0m"
+    ver = i[/\d+\.?\d*/].to_f
+    s = File.join('/Applications', i, 'Contents/MacOS/ChemDraw')
+    if ver < 17
+        puts "\e[1;31mKhông phù hợp (Phiên bản #{ver} < 17)\e[0m"; next
+    elsif ver < 18
+        f = s
+    else
+        f = File.join('/Applications', i, 'Contents/Frameworks/ChemDrawBase.framework/Versions/A/ChemDrawBase')
+    end
+    if File.exist?(f) and File.exist?(s) # it runs fine on terminal but not on unix binary file (tebako doesn't like 'exists' as an alias of 'exist')
+        removeSig(s); patch(f); @vers += 1
+    else
+        puts "\e[1;31mKhông thể tiến hành được (không tìm thấy file)\e[0m"
+    end
+end
+puts
+if @vers.zero?
+    puts "\e[1;31mPhiên bản ChemDraw không phù hợp\e[0m"
+else
+    puts "\e[1;33mĐã có tổng cộng #{@vers} phiên bản ChemDraw được vá.\e[0m"
+end
