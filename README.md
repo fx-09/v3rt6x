@@ -2,6 +2,8 @@
 Một loại thuốc vô cùng đặc biệt cho phần mềm màu xanh lá hay vẽ vẽ mấy cái hợp chất.
 Được viết bằng Ruby.
 
+[Nhấn vào đây để tải](https://github.com/fx09-release/v3rt6x_release/releases/tag/1.0).
+
 ## Cách compile 
 Mình dùng hai công cụ khác nhau để compile cho hai hệ điều hành khác nhau. Với Windows, mình dùng [ocran](https://github.com/Largo/ocran). Còn với macOS, mình dùng [tebako](https://github.com/tamatebako/tebako).
 
