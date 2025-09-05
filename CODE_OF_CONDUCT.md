@@ -29,7 +29,4 @@ If I verify a reported Code of Conduct violation, my policy is:
   - Other conduct which could reasonably be inappropriate in a professional setting.
 
 - Contributors may make patches only to the main branch unless an additional branch is involved. This policy applies to implementing custom features/options, updated features/options, and grammatical errors.
-
-- Users who fork this repository, utilize it in actions, or build it from the repository on Git are strictly prohibited from releasing IPA files in any form on their forked repositories. Failure to adhere to this rule may result in legal action being taken by either the tweak developer or Meta.
-
 - Contributor who uses this project for commercial purposes will have their access revoked, no one should be charged for such a simple artifact.
