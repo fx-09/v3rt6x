@@ -1,6 +1,6 @@
 # encoding: ASCII-8Bit
 
-system("title ChemOffice Suite 18.0-23.0 Patcher (v0rt3x) by Đức Lê.")
+system("title ChemOffice Suite 18.0-25.0.2 Patcher (v0rt3x) by Đức Lê.")
 Dir.chdir(File.dirname($Exerb ? ExerbRuntime.filepath : __FILE__)) # change currentDir to the file location
 
 @total = [0, 0, 0, 0, 0, 0] # number of [all, patched, restored, ignored, failed, patial] files
@@ -79,7 +79,7 @@ def patch(filename, mode)
     for j in 0...found.size
       unless found[j]
         missing = true
-        puts "\e[1;31mKhông tìm thấy mẫu func\e[0m #{@pattern[j][4]} [#{@pattern[j][0]} \e[7m..\e[0m #{@pattern[j][1]}]."
+        puts "\e[1;31mKhông tìm thấy func\e[0m #{@pattern[j][4]} [#{@pattern[j][0]} \e[7m..\e[0m #{@pattern[j][1]}]."
       end
     end
     @total[0] += 1
@@ -93,7 +93,7 @@ def patch(filename, mode)
   end
   f.close
 rescue # error
-  puts "\e[1;31mĐã xảy ra lỗi:"
+  puts "\e[1;31mĐã phát sinh lỗi:"
   @total[4] += 1
   puts $!.inspect; puts $@.inspect
   print "\e[0m"
@@ -104,7 +104,7 @@ puts "\nBạn đã cài đặt:"
 for i in 0..1 # check 32-bit and 64-bit registry
   list = ''
   print "  \e[1;33m#{(i+1)*32}-bit ChemOffice\e[0m "
-  ['ChemOffice ', 'ChemDraw Suite'].each {|n|
+  ['ChemOffice ', 'ChemDraw Suite', 'Revvity ChemDraw'].each {|n|
     ['HKLM', 'HKCU'].each {|j| list +=  `reg query #{j}\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall /s /t REG_SZ /f "#{n}" /reg:#{(i+1)*32} 2>nul`}} # check CurrentUser and LocalMachine ("ChemOffice " the space is necessary to exclude ChemOffice+; ChemDraw Suite is for version >= 23)
   for k in list.split("\n\n")
     next unless k.include?('DisplayName')
@@ -152,7 +152,7 @@ for i in 0..1
   if File.directory?(File.join(listVer[i][3], 'Common'))
     rename << File.join(listVer[i][3], 'Common\DLLs\FlxComm' + '64'*i + '.dll')
     rename << File.join(listVer[i][3], 'Common\DLLs\FlxCore' + '64'*i + '.dll')
-  else # 23.0 NA version; dlls stored under installation root dir, users might have to use the "T" option
+  else # 23.0 NA version; dlls stored under installation root dir
     rename << File.join(listVer[i][3], 'FlxComm' + '64'*i + '.dll')
     rename << File.join(listVer[i][3], 'FlxCore' + '64'*i + '.dll')
   end
@@ -182,7 +182,7 @@ rename.each do |i|
         @total[3] += 1
       else
         File.rename(i, i+'.bak')
-        puts "\e[1;32m: Đã đổi tên thành .bak file.\e[0m"
+        puts "\e[1;32m: Đã đổi phần mở rộng từ .dll thành .bak\e[0m"
         @total[1] += 1
       end
     else
@@ -204,7 +204,7 @@ rename.each do |i|
 end
 patch.each {|i| patch(i, m)}
 
-puts; puts "Trong #{@total[0]} file để kích hoạt (DRM), \e[1;32m#{@total[1]} đã được vá, \e[1;33m#{@total[2]} đã được hoàn tác, \e[1;31m#{@total[4]} thất bại, \e[1;35m#{@total[5]} có kết quả không như mong đợi, \e[0mand #{@total[3]} được bỏ qua."
+puts; puts "Trong #{@total[0]} file để crack DRM, \e[1;32m#{@total[1]} đã được vá, \e[1;33m#{@total[2]} đã được hoàn tác, \e[1;31m#{@total[4]} thất bại, \e[1;35m#{@total[5]} có kết quả không như mong đợi, \e[0mand #{@total[3]} được bỏ qua."
 
 if m == 'R' then puts; system('pause'); exit end
 
@@ -229,7 +229,7 @@ for i in 0..1
   end
 end
 
-puts "\nĐã thay đổi truy vấn Registry. \e[1;32mHOÀN THÀNH CÔNG VIỆC.\e[0m\nTuỳ chọn: Vui lòng nhập \e[4thông tin cá nhân\e[0m (bỏ trống cũng được), và tận hưởng ChemOffice!" unless m == 'H'
+puts "\nĐã thay đổi Registry. \e[1;32mĐÃ HOÀN THÀNH CÔNG VIỆC.\e[0m\nTuỳ chọn: Vui lòng nhập \e[4thông tin cá nhân\e[0m (bỏ trống cũng được)!" unless m == 'H'
 
 info = ['', '', '']
 print '  Tên người dùng:    _______________'; print "\b"*15
