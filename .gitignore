@@ -1,0 +1,6 @@
+!.gitignore
+*.ico
+*.exe
+*.tar
+*.zip
+*.rar

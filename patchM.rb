@@ -2,7 +2,7 @@
 # encoding: ASCII-8Bit
 # ruby 2.0.0
 require 'io/console'
-print "\033]0;Thuốc đặc trị ChemDraw 17~25 (Vortex on macOS) by Đức Lê.4\007"
+print "\033]0;vortex v1.2 - ChemOffice DRM patcher by fx-09.4\007"
 
 def removeAllSig(filename)
     puts "\e[1;33mĐang xử lý\e[0m #{filename}..."

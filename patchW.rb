@@ -1,6 +1,6 @@
 # encoding: ASCII-8Bit
 
-system("title ChemOffice Suite 18.0-25.0.2 Patcher (v0rt3x) by Đức Lê.")
+system("title vortex v1.2 - ChemOffice DRM patcher by fx-09")
 Dir.chdir(File.dirname($Exerb ? ExerbRuntime.filepath : __FILE__)) # change currentDir to the file location
 
 @total = [0, 0, 0, 0, 0, 0] # number of [all, patched, restored, ignored, failed, patial] files
