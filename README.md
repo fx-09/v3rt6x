@@ -2,7 +2,7 @@
 Một loại thuốc vô cùng đặc biệt cho phần mềm màu xanh lá hay vẽ vẽ mấy cái hợp chất.
 Được viết bằng Ruby.
 
-[Nhấn vào đây để tải (khuyên dùng)](https://github.com/fx09-release/v3rt6x_release/releases/tag/1.0).
+[Nhấn vào đây để tải (khuyên dùng)](https://github.com/fx09-release/v3rt6x_release/releases/tag/1.2).
 
 ## Cách compile (dành cho những ai muốn làm thủ công)
 Mình dùng hai công cụ khác nhau để compile cho hai hệ điều hành khác nhau. Với Windows, mình dùng [ocran](https://github.com/Largo/ocran). Còn với macOS, mình dùng [tebako](https://github.com/tamatebako/tebako).
@@ -24,4 +24,5 @@ Mình dùng hai công cụ khác nhau để compile cho hai hệ điều hành k
     Chạy ```tebako setup``` để cache các thư viện cần thiết. Sau đó chạy ```tebako press -e <tới đường dẫn file .rb (trong trường hợp này là patchM.rb)> -r <tới thư mục root (thư mục này tuỳ chọn)>```.
 
     Lưu ý: Mình không khuyến khích dùng lệnh ```sudo``` cho bất kỳ thao tác compile. Các bạn nên dựng môi trường thích hợp để có thể code mà không cần đến quyền root.
+
 
